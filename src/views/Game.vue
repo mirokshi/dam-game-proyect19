@@ -5,8 +5,9 @@
   <script>
     /* eslint-disable */
     import Phaser from 'phaser'
-    import _TILESET_SET from '../assets/tileset.png'
-    import _JSON_MAP from '../assets/map.json'
+    import _TILESET_SET from '../assets/tileSets/tilesets.png'
+    import _JSON_MAP from '../assets/tileSets/map.json'
+    import _PLAYER_BOMB from '../assets/tileSets/playerBomb/idle/26.png'
 
     export default {
       name: 'Game',
@@ -16,8 +17,8 @@
         // PHASER 3.0 -> phaser
         let config = {
           type: Phaser.AUTO,
-          width: window.innerWidth -25,
-          height: window.innerHeight -20,
+          width: window.innerWidth-25,
+          height: window.innerHeight-20,
           physics: {
             default: 'arcade',
             arcade: {
@@ -31,14 +32,12 @@
               this.load.tilemapTiledJSON("map",_JSON_MAP)
             },
             create() {
-              // let map = this.make.tilemap({ key: "_JSON_MAP" })
-              // let tileset = map.addTilesetImage("game", "tileset")
-              // map.createStaticLayer("Background", tileset, 0, 0)
-              // map.createStaticLayer("walls", tileset, 0, 0)
+              let map = this.make.tilemap({ key: "map" })
+              let tileset = map.addTilesetImage("tilesets", "tileset")
+              map.createStaticLayer("background", tileset, 0, 0)
+              map.createStaticLayer("floor", tileset, 0, 0)
 
-
-
-
+              this.cameras.main.setZoom(0.5)
             },
             update() {
 
