@@ -20,18 +20,6 @@
          "name":"player",
          "objects":[
                 {
-                 "gid":57,
-                 "height":125.5,
-                 "id":4,
-                 "name":"",
-                 "rotation":-0.0406528671910381,
-                 "type":"",
-                 "visible":true,
-                 "width":125.166666666667,
-                 "x":193.54453852988,
-                 "y":3263.04438872736
-                }, 
-                {
                  "height":0,
                  "id":5,
                  "name":"spawnpoint",
@@ -40,8 +28,20 @@
                  "type":"",
                  "visible":true,
                  "width":0,
-                 "x":257.333333333333,
-                 "y":3134.66666666667
+                 "x":257.333,
+                 "y":3134.67
+                }, 
+                {
+                 "gid":48,
+                 "height":126.666666666667,
+                 "id":7,
+                 "name":"",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":122.833333333333,
+                 "x":194.166666666667,
+                 "y":3263
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -62,8 +62,8 @@
          "x":0,
          "y":0
         }],
- "nextlayerid":10,
- "nextobjectid":6,
+ "nextlayerid":12,
+ "nextobjectid":8,
  "orientation":"orthogonal",
  "renderorder":"left-up",
  "tiledversion":"1.2.3",
@@ -112,367 +112,262 @@
          "tiles":[
                 {
                  "id":0,
-                 "image":"playerBomb\/1-Idle\/1.png",
+                 "image":"playerBomb\/idle\/1.png",
                  "imageheight":58,
                  "imagewidth":58
                 }, 
                 {
                  "id":1,
-                 "image":"playerBomb\/1-Idle\/2.png",
+                 "image":"playerBomb\/idle\/2.png",
                  "imageheight":58,
                  "imagewidth":58
                 }, 
                 {
                  "id":2,
-                 "image":"playerBomb\/1-Idle\/3.png",
+                 "image":"playerBomb\/idle\/3.png",
                  "imageheight":58,
                  "imagewidth":58
                 }, 
                 {
                  "id":3,
-                 "image":"playerBomb\/1-Idle\/4.png",
+                 "image":"playerBomb\/idle\/4.png",
                  "imageheight":58,
                  "imagewidth":58
                 }, 
                 {
                  "id":4,
-                 "image":"playerBomb\/1-Idle\/5.png",
+                 "image":"playerBomb\/idle\/5.png",
                  "imageheight":58,
                  "imagewidth":58
                 }, 
                 {
                  "id":5,
-                 "image":"playerBomb\/1-Idle\/6.png",
+                 "image":"playerBomb\/idle\/6.png",
                  "imageheight":58,
                  "imagewidth":58
                 }, 
                 {
                  "id":6,
-                 "image":"playerBomb\/1-Idle\/7.png",
+                 "image":"playerBomb\/idle\/7.png",
                  "imageheight":58,
                  "imagewidth":58
                 }, 
                 {
                  "id":7,
-                 "image":"playerBomb\/1-Idle\/8.png",
+                 "image":"playerBomb\/idle\/8.png",
                  "imageheight":58,
                  "imagewidth":58
                 }, 
                 {
                  "id":8,
-                 "image":"playerBomb\/1-Idle\/9.png",
+                 "image":"playerBomb\/idle\/9.png",
                  "imageheight":58,
                  "imagewidth":58
                 }, 
                 {
                  "id":9,
-                 "image":"playerBomb\/1-Idle\/10.png",
+                 "image":"playerBomb\/idle\/10.png",
                  "imageheight":58,
                  "imagewidth":58
                 }, 
                 {
                  "id":10,
-                 "image":"playerBomb\/1-Idle\/11.png",
+                 "image":"playerBomb\/idle\/11.png",
                  "imageheight":58,
                  "imagewidth":58
                 }, 
                 {
                  "id":11,
-                 "image":"playerBomb\/1-Idle\/12.png",
+                 "image":"playerBomb\/idle\/12.png",
                  "imageheight":58,
                  "imagewidth":58
                 }, 
                 {
                  "id":12,
-                 "image":"playerBomb\/1-Idle\/13.png",
+                 "image":"playerBomb\/idle\/13.png",
                  "imageheight":58,
                  "imagewidth":58
                 }, 
                 {
                  "id":13,
-                 "image":"playerBomb\/1-Idle\/14.png",
+                 "image":"playerBomb\/idle\/14.png",
                  "imageheight":58,
                  "imagewidth":58
                 }, 
                 {
                  "id":14,
-                 "image":"playerBomb\/1-Idle\/15.png",
+                 "image":"playerBomb\/idle\/15.png",
                  "imageheight":58,
                  "imagewidth":58
                 }, 
                 {
                  "id":15,
-                 "image":"playerBomb\/1-Idle\/16.png",
+                 "image":"playerBomb\/idle\/16.png",
                  "imageheight":58,
                  "imagewidth":58
                 }, 
                 {
+                 "animation":[
+                        {
+                         "duration":1,
+                         "tileid":0
+                        }, 
+                        {
+                         "duration":1,
+                         "tileid":1
+                        }, 
+                        {
+                         "duration":1,
+                         "tileid":2
+                        }, 
+                        {
+                         "duration":1,
+                         "tileid":3
+                        }, 
+                        {
+                         "duration":1,
+                         "tileid":4
+                        }, 
+                        {
+                         "duration":1,
+                         "tileid":5
+                        }, 
+                        {
+                         "duration":1,
+                         "tileid":6
+                        }, 
+                        {
+                         "duration":1,
+                         "tileid":7
+                        }, 
+                        {
+                         "duration":1,
+                         "tileid":8
+                        }, 
+                        {
+                         "duration":1,
+                         "tileid":9
+                        }, 
+                        {
+                         "duration":1,
+                         "tileid":10
+                        }, 
+                        {
+                         "duration":1,
+                         "tileid":11
+                        }, 
+                        {
+                         "duration":1,
+                         "tileid":12
+                        }, 
+                        {
+                         "duration":1,
+                         "tileid":13
+                        }, 
+                        {
+                         "duration":1,
+                         "tileid":14
+                        }, 
+                        {
+                         "duration":1,
+                         "tileid":15
+                        }, 
+                        {
+                         "duration":1,
+                         "tileid":16
+                        }, 
+                        {
+                         "duration":1,
+                         "tileid":17
+                        }, 
+                        {
+                         "duration":1,
+                         "tileid":18
+                        }, 
+                        {
+                         "duration":1,
+                         "tileid":19
+                        }, 
+                        {
+                         "duration":1,
+                         "tileid":20
+                        }, 
+                        {
+                         "duration":1,
+                         "tileid":21
+                        }, 
+                        {
+                         "duration":1,
+                         "tileid":22
+                        }, 
+                        {
+                         "duration":1,
+                         "tileid":23
+                        }, 
+                        {
+                         "duration":1,
+                         "tileid":24
+                        }, 
+                        {
+                         "duration":1,
+                         "tileid":25
+                        }],
                  "id":16,
-                 "image":"playerBomb\/1-Idle\/17.png",
+                 "image":"playerBomb\/idle\/17.png",
                  "imageheight":58,
                  "imagewidth":58
                 }, 
                 {
                  "id":17,
-                 "image":"playerBomb\/1-Idle\/18.png",
+                 "image":"playerBomb\/idle\/18.png",
                  "imageheight":58,
                  "imagewidth":58
                 }, 
                 {
                  "id":18,
-                 "image":"playerBomb\/1-Idle\/19.png",
+                 "image":"playerBomb\/idle\/19.png",
                  "imageheight":58,
                  "imagewidth":58
                 }, 
                 {
                  "id":19,
-                 "image":"playerBomb\/1-Idle\/20.png",
+                 "image":"playerBomb\/idle\/20.png",
                  "imageheight":58,
                  "imagewidth":58
                 }, 
                 {
                  "id":20,
-                 "image":"playerBomb\/1-Idle\/21.png",
+                 "image":"playerBomb\/idle\/21.png",
                  "imageheight":58,
                  "imagewidth":58
                 }, 
                 {
                  "id":21,
-                 "image":"playerBomb\/1-Idle\/22.png",
+                 "image":"playerBomb\/idle\/22.png",
                  "imageheight":58,
                  "imagewidth":58
                 }, 
                 {
                  "id":22,
-                 "image":"playerBomb\/1-Idle\/23.png",
+                 "image":"playerBomb\/idle\/23.png",
                  "imageheight":58,
                  "imagewidth":58
                 }, 
                 {
                  "id":23,
-                 "image":"playerBomb\/1-Idle\/24.png",
+                 "image":"playerBomb\/idle\/24.png",
                  "imageheight":58,
                  "imagewidth":58
                 }, 
                 {
-                 "animation":[
-                        {
-                         "duration":40,
-                         "tileid":0
-                        }, 
-                        {
-                         "duration":40,
-                         "tileid":1
-                        }, 
-                        {
-                         "duration":40,
-                         "tileid":2
-                        }, 
-                        {
-                         "duration":40,
-                         "tileid":3
-                        }, 
-                        {
-                         "duration":40,
-                         "tileid":4
-                        }, 
-                        {
-                         "duration":40,
-                         "tileid":5
-                        }, 
-                        {
-                         "duration":40,
-                         "tileid":6
-                        }, 
-                        {
-                         "duration":40,
-                         "tileid":7
-                        }, 
-                        {
-                         "duration":40,
-                         "tileid":8
-                        }, 
-                        {
-                         "duration":40,
-                         "tileid":9
-                        }, 
-                        {
-                         "duration":40,
-                         "tileid":10
-                        }, 
-                        {
-                         "duration":40,
-                         "tileid":11
-                        }, 
-                        {
-                         "duration":40,
-                         "tileid":12
-                        }, 
-                        {
-                         "duration":40,
-                         "tileid":13
-                        }, 
-                        {
-                         "duration":40,
-                         "tileid":14
-                        }, 
-                        {
-                         "duration":40,
-                         "tileid":15
-                        }, 
-                        {
-                         "duration":40,
-                         "tileid":16
-                        }, 
-                        {
-                         "duration":40,
-                         "tileid":17
-                        }, 
-                        {
-                         "duration":40,
-                         "tileid":18
-                        }, 
-                        {
-                         "duration":40,
-                         "tileid":19
-                        }, 
-                        {
-                         "duration":40,
-                         "tileid":20
-                        }, 
-                        {
-                         "duration":40,
-                         "tileid":21
-                        }, 
-                        {
-                         "duration":40,
-                         "tileid":22
-                        }, 
-                        {
-                         "duration":40,
-                         "tileid":23
-                        }, 
-                        {
-                         "duration":40,
-                         "tileid":24
-                        }, 
-                        {
-                         "duration":40,
-                         "tileid":25
-                        }],
                  "id":24,
-                 "image":"playerBomb\/1-Idle\/25.png",
+                 "image":"playerBomb\/idle\/25.png",
                  "imageheight":58,
                  "imagewidth":58
                 }, 
                 {
-                 "animation":[
-                        {
-                         "duration":40,
-                         "tileid":0
-                        }, 
-                        {
-                         "duration":40,
-                         "tileid":1
-                        }, 
-                        {
-                         "duration":40,
-                         "tileid":2
-                        }, 
-                        {
-                         "duration":40,
-                         "tileid":3
-                        }, 
-                        {
-                         "duration":40,
-                         "tileid":4
-                        }, 
-                        {
-                         "duration":40,
-                         "tileid":5
-                        }, 
-                        {
-                         "duration":40,
-                         "tileid":6
-                        }, 
-                        {
-                         "duration":40,
-                         "tileid":7
-                        }, 
-                        {
-                         "duration":40,
-                         "tileid":8
-                        }, 
-                        {
-                         "duration":40,
-                         "tileid":9
-                        }, 
-                        {
-                         "duration":40,
-                         "tileid":10
-                        }, 
-                        {
-                         "duration":40,
-                         "tileid":11
-                        }, 
-                        {
-                         "duration":40,
-                         "tileid":12
-                        }, 
-                        {
-                         "duration":40,
-                         "tileid":13
-                        }, 
-                        {
-                         "duration":40,
-                         "tileid":14
-                        }, 
-                        {
-                         "duration":40,
-                         "tileid":15
-                        }, 
-                        {
-                         "duration":40,
-                         "tileid":16
-                        }, 
-                        {
-                         "duration":40,
-                         "tileid":17
-                        }, 
-                        {
-                         "duration":40,
-                         "tileid":18
-                        }, 
-                        {
-                         "duration":40,
-                         "tileid":19
-                        }, 
-                        {
-                         "duration":40,
-                         "tileid":20
-                        }, 
-                        {
-                         "duration":40,
-                         "tileid":21
-                        }, 
-                        {
-                         "duration":40,
-                         "tileid":22
-                        }, 
-                        {
-                         "duration":40,
-                         "tileid":23
-                        }, 
-                        {
-                         "duration":40,
-                         "tileid":24
-                        }, 
-                        {
-                         "duration":40,
-                         "tileid":25
-                        }],
                  "id":25,
-                 "image":"playerBomb\/1-Idle\/26.png",
+                 "image":"playerBomb\/idle\/26.png",
                  "imageheight":58,
                  "imagewidth":58
                 }],
