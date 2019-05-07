@@ -6,10 +6,10 @@
     import Phaser from 'phaser'
     import _TILESET_SET from '../assets/tileSets/tilesets.png'
     import _JSON_MAP from '../assets/tileSets/map.json'
-    import _PLAYER_BOMB from '../assets/tileSets/dude.png'
+    import _PLAYER from '../assets/tileSets/metalslug_mummy37x45.png'
 
     var player;
-    var platforms;
+
     export default {
       name: 'Game',
       created() {
@@ -23,7 +23,8 @@
           physics: {
             default: 'arcade',
             arcade: {
-              gravity: {y: 200}
+              gravity: {y: 300},
+              debug :true
             }
           },
           // NO HI HA STATES A 3.0 -> SCENES
@@ -32,46 +33,72 @@
               console.log("PRELOAD");
               this.load.image('tileset', _TILESET_SET)
               this.load.tilemapTiledJSON("map",_JSON_MAP)
-              this.load.spritesheet('player',_PLAYER_BOMB,{frameWidth:280,frameHeight:220})
+              this.load.spritesheet('player',_PLAYER ,{ frameWidth: 37, frameHeight: 45 })
+
             },
             create() {
+              const camera = this.cameras.main;
               console.log("CREATED");
-              // this.cameras.main.backgroundColor.setTo(52,152,219)
-
               let map = this.make.tilemap({ key: "map" })
               let tileset = map.addTilesetImage("tilesets", "tileset")
-              map.createStaticLayer("background", tileset, 0, 0)
-              map.createStaticLayer("floor", tileset, 0, 0)
-              this.physics.add.staticGroup();
+              let background =map.createStaticLayer("background", tileset, 0, 0)
+              let floor = map.createStaticLayer("floor", tileset, 0, 0)
 
-              player = this.physics.add.sprite(200, 850, 'player');
-              player.setBounce(0.2);
-              player.setCollideWorldBounds(true);
+              background.setCollisionByExclusion([-1]);
+              floor.setCollisionByExclusion([-1]);
 
+
+              // Habilitem un cursor per a les fletxes del teclat
+              this.cursors = this.input.keyboard.createCursorKeys();
+
+              // La càmara no sortirà del món
+              camera.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
+
+              let spawnpoint = map.findObject('player', obj => obj.name === 'spanwPoint');
+
+              player = this.physics.add.sprite(spawnpoint.x, spawnpoint.y, 'player');
+              player.setScale(2);
+              player.lives = 3;
+
+              // Animació de correr del player
               this.anims.create({
-                key: 'left',
-                frames: this.anims.generateFrameNumbers('player', { start: 0, end: 3 }),
-                frameRate: 10,
+                key: 'walk',
+                frames: this.anims.generateFrameNames('player', {
+                  frames: [0, 17]
+                }),
+                frameRate: 8,
                 repeat: -1
               });
 
-              this.anims.create({
-                key: 'turn',
-                frames: [ { key: 'player', frame: 4 } ],
-                frameRate: 20
-              });
+              this.physics.add.collider(player,floor)
 
-              this.anims.create({
-                key: 'right',
-                frames: this.anims.generateFrameNumbers('player', { start: 5, end: 8 }),
-                frameRate: 10,
-                repeat: -1
-              });
+              camera.startFollow(player)
 
-              this.cameras.main.setZoom(0.5)
-              this.cameras.main.startFollow(player)
             },
             update() {
+              if (this.cursors.left.isDown) {
+                player.anims.play('walk', true)
+                player.setVelocityX(-500)
+                player.flipX = true
+              }else if (this.cursors.right.isDown) {
+                player.anims.play('walk', true)
+                player.setVelocityX(500)
+                player.flipX = false
+              } else {
+                player.setFrame(9)
+                player.setVelocityX(0)
+              }
+
+              if (this.cursors.up.isDown && player.body.onFloor()) {
+                player.setVelocityY(-800)
+              }
+              if(player.body.velocity.y < 0){
+                player.setFrame(14)
+              }
+              if(player.body.velocity.y > 0){
+                player.setFrame(17)
+                player.body.setMaxVelocity(500, 800);
+              }
 
             }
           }
