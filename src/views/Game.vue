@@ -7,8 +7,8 @@
     import _TILESET_SET from '../assets/tileSets/tilesets.png'
     import _JSON_MAP from '../assets/tileSets/map.json'
     import _PLAYER from '../assets/tileSets/metalslug_mummy37x45.png'
-
     var player;
+
 
     export default {
       name: 'Game',
@@ -43,9 +43,11 @@
               let tileset = map.addTilesetImage("tilesets", "tileset")
               let background =map.createStaticLayer("background", tileset, 0, 0)
               let floor = map.createStaticLayer("floor", tileset, 0, 0)
+              let elevation = map.createStaticLayer("elevation",tileset,0,0)
 
               background.setCollisionByExclusion([-1]);
               floor.setCollisionByExclusion([-1]);
+              elevation.setCollisionByExclusion([-1]);
 
 
               // Habilitem un cursor per a les fletxes del teclat
@@ -71,6 +73,7 @@
               });
 
               this.physics.add.collider(player,floor)
+              this.physics.add.collider(player,elevation)
 
               camera.startFollow(player)
 
@@ -90,7 +93,7 @@
               }
 
               if (this.cursors.up.isDown && player.body.onFloor()) {
-                player.setVelocityY(-800)
+                player.setVelocityY(-900)
               }
               if(player.body.velocity.y < 0){
                 player.setFrame(14)
