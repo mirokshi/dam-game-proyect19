@@ -4,8 +4,8 @@
   <script>
     /* eslint-disable */
     import Phaser from 'phaser'
-    import _TILESET_SET from '../assets/tileSets/tilesets.png'
-    import _JSON_MAP from '../assets/tileSets/map.json'
+    import _TILESET_SET from '../assets/tileSets/tileset.png'
+    import _JSON_MAP from '../assets/tileSets/mapa.json'
     import _PLAYER from '../assets/tileSets/metalslug_mummy37x45.png'
     var player;
 
@@ -40,14 +40,16 @@
               const camera = this.cameras.main;
               console.log("CREATED");
               let map = this.make.tilemap({ key: "map" })
-              let tileset = map.addTilesetImage("tilesets", "tileset")
-              let background =map.createStaticLayer("background", tileset, 0, 0)
-              let floor = map.createStaticLayer("floor", tileset, 0, 0)
-              let elevation = map.createStaticLayer("elevation",tileset,0,0)
+              let tileset = map.addTilesetImage("tileset", "tileset")
+              let backgroundP =map.createStaticLayer("backgroundP", tileset, 0, 0)
+              let backgroundS =map.createStaticLayer("backgroundS", tileset, 0, 0)
+              let details = map.createStaticLayer("details", tileset, 0, 0)
+              let walls = map.createStaticLayer("walls",tileset,0,0)
 
-              background.setCollisionByExclusion([-1]);
-              floor.setCollisionByExclusion([-1]);
-              elevation.setCollisionByExclusion([-1]);
+              backgroundP.setCollisionByExclusion([-1]);
+              backgroundS.setCollisionByExclusion([-1]);
+              details.setCollisionByExclusion([-1]);
+              walls.setCollisionByExclusion([-1]);
 
 
               // Habilitem un cursor per a les fletxes del teclat
@@ -56,10 +58,10 @@
               // La càmara no sortirà del món
               camera.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
 
-              let spawnpoint = map.findObject('player', obj => obj.name === 'spanwPoint');
+              let spawnpoint = map.findObject('player', obj => obj.name === 'spawnpoint');
 
               player = this.physics.add.sprite(spawnpoint.x, spawnpoint.y, 'player');
-              player.setScale(2);
+              player.setScale(0.5);
               player.lives = 3;
 
               // Animació de correr del player
@@ -72,9 +74,10 @@
                 repeat: -1
               });
 
-              this.physics.add.collider(player,floor)
-              this.physics.add.collider(player,elevation)
-
+              this.physics.add.collider(player,walls)
+              this.physics.add.collider(player,walls)
+              // this.physics.add.collider(player,elevation)
+              camera.setZoom(4)
               camera.startFollow(player)
 
             },
