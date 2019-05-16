@@ -6,7 +6,7 @@
     import Phaser from 'phaser'
     import _TILESET_SET from '../assets/tileSets/tileset.png'
     import _JSON_MAP from '../assets/tileSets/mapa.json'
-    import _PLAYER from '../assets/tileSets/metalslug_mummy37x45.png'
+    import _PLAYER from '../assets/player/cyclops.png'
     var player;
 
 
@@ -33,7 +33,7 @@
               console.log("PRELOAD");
               this.load.image('tileset', _TILESET_SET)
               this.load.tilemapTiledJSON("map",_JSON_MAP)
-              this.load.spritesheet('player',_PLAYER ,{ frameWidth: 37, frameHeight: 45 })
+              this.load.spritesheet('player',_PLAYER ,{ frameWidth: 64, frameHeight: 64 })
 
             },
             create() {
@@ -61,23 +61,32 @@
               let spawnpoint = map.findObject('player', obj => obj.name === 'spawnpoint');
 
               player = this.physics.add.sprite(spawnpoint.x, spawnpoint.y, 'player');
-              player.setScale(0.5);
+              // player.setScale(0.5);
               player.lives = 3;
 
+              //Animacion parado
+              this.anims.create({
+                key:'stop',
+                frames:this.anims.generateFrameNames('player',{
+                  frames: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14]
+                }),
+                frameRate:7,
+                repeat:-1
+              });
               // Animació de correr del player
               this.anims.create({
                 key: 'walk',
                 frames: this.anims.generateFrameNames('player', {
-                  frames: [0, 17]
+                  frames: [15,16,17,18,19,20,21,22,23,24,25, 26]
                 }),
-                frameRate: 8,
+                frameRate: 20,
                 repeat: -1
               });
 
               this.physics.add.collider(player,walls)
               this.physics.add.collider(player,walls)
               // this.physics.add.collider(player,elevation)
-              camera.setZoom(4)
+              // camera.setZoom(4)
               camera.startFollow(player)
 
             },
@@ -91,11 +100,12 @@
                 player.setVelocityX(500)
                 player.flipX = false
               } else {
-                player.setFrame(9)
+                player.anims.play('stop',true)
                 player.setVelocityX(0)
               }
 
               if (this.cursors.up.isDown && player.body.onFloor()) {
+                player.setFrame()
                 player.setVelocityY(-900)
               }
               if(player.body.velocity.y < 0){
@@ -103,7 +113,7 @@
               }
               if(player.body.velocity.y > 0){
                 player.setFrame(17)
-                player.body.setMaxVelocity(500, 800);
+                player.body.setMaxVelocity(400, 550);
               }
 
             }
