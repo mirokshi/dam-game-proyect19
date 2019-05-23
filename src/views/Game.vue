@@ -11,39 +11,40 @@
     import _ENEMIES from '../assets/characters/imp.png'
     import _OBJECTS from '../assets/objects/objects.png'
     //sounds
-    import _DANCIN from '../assets/sounds/dancin.mp3'
+    import _GAME_MUSIC from '../assets/sounds/wapons.mp3'
+
 
     let camera;
-    let progressBar;
-    let progressBox;
     let player;
     let CoinLayer;
     let coins;
     let EnemyLayer;
     let enemies;
+    let coinScore = 0;
+    let scoreText;
 
-    //
-    // function drawOctopus(game, map, num_octopus) {
-    //   game.octopus = game.physics.add.group();
-    //   game.octopus.enableBody = true;
-    //
-    //   for (let i  = 1; i<= num_octopus; i++){
-    //     let octupusPosition = map.findObject("coins", obj => obj.name ==="coin"+i);
-    //     let octopus = game.octopus.create(octupusPosition.x, octupusPosition.y-50,'objects',265);
-    //     game.physics.add.existing(octopus)
-    //     octopus.body.allowGravity = false;
-    //   }
-    // }
+
     function changeDirection (enemy) {
       enemy.speedX*=-1
     }
     function createCoins () {
       CoinLayer.forEach(object => {
-        let obj = coins.create(object.x, object.y, 'objects',199)
+        let obj = coins.create(object.x, object.y, 'objects',243)
         obj.body.width = object.width
         obj.body.height = object.height
         // obj.anims.play('spin', coins)
       })
+    }
+    function  takeCoin(player, coin) {
+      // coin.destroy(coin.x,coin.y)
+      // coinScore++
+      // text.setText(`Coins: ${coinScore}-16`)
+      // return false
+      coin.disableBody(true,true)
+      coinScore+=10
+      scoreText.setText('Score: '+coinScore)
+      // console.log(scoreText);
+
     }
     function createEnemies () {
       EnemyLayer.forEach(object => {
@@ -53,7 +54,7 @@
         // obj.setOrigin(0)
         obj.body.width = object.width
         obj.body.height = object.height
-        obj.speedX = -50
+        obj.speedX = 50
 
       })
     }
@@ -146,7 +147,8 @@
         this.load.spritesheet('enemy',_ENEMIES ,{ frameWidth: 32, frameHeight: 32 })
         // this.load.image('spark', Spark)
 
-        this.load.audio('sound',_DANCIN)
+        this.load.audio('sound',_GAME_MUSIC)
+
       }
       create () {
         this.scene.start('inGame')
@@ -172,6 +174,7 @@
         let tileset = map.addTilesetImage("tileset", "tileset")
         // let tilest_object = map.addTilesetImage("objects", "objects")
         let backgroundP =map.createStaticLayer("backgroundP", tileset, 0, 0)
+        let collision = map.createStaticLayer("collisions",tileset,0,0)
         let backgroundS =map.createStaticLayer("backgroundS", tileset, 0, 0)
         let details = map.createStaticLayer("details", tileset, 0, 0)
         let walls = map.createStaticLayer("walls",tileset,0,0)
@@ -183,13 +186,11 @@
         // enemies.enableBody=true;
 
         backgroundP.setCollisionByExclusion([-1]);
+        collision.setCollisionByExclusion([-1]);
         backgroundS.setCollisionByExclusion([-1]);
         details.setCollisionByExclusion([-1]);
         walls.setCollisionByExclusion([-1]);
         // walls.setCollisionBetween(0,1999)
-
-        // Habilitem un cursor per a les fletxes del teclat
-        this.cursors = this.input.keyboard.createCursorKeys();
 
         // La càmara no sortirà del món
         camera.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
@@ -197,11 +198,11 @@
         //Aparicion del personaje
         let spawnpoint = map.findObject('player', obj => obj.name === 'spawnpoint');
         player = this.physics.add.sprite(spawnpoint.x, spawnpoint.y, 'player');
-
         player.body.setSize(24, 64, 40, 0)
-        // player.setScale(2);
         player.lives = 3;
 
+        // Habilitem un cursor per a les fletxes del teclat
+        this.cursors = this.input.keyboard.createCursorKeys();
         //Animacion parado
         this.anims.create({
           key:'idle',
@@ -232,12 +233,16 @@
         createEnemies()
 
         this.physics.add.collider(player,walls)
-        // this.physics.add.collider(player,coins)
         this.physics.add.collider(enemies,walls)
+        this.physics.add.collider(enemies,collision,changeDirection)
+        this.physics.add.overlap(player,coins,takeCoin,null,this)
 
-        // drawOctopus(this,map,14)
         camera.setZoom(2)
         camera.startFollow(player)
+
+        scoreText=this.add.text(16,16,'Score: 0',{fontSize:'32px',fill:'#000'})
+        scoreText.setColor('#ffffff')
+        scoreText.setScrollFactor(0)
 
 
       }
@@ -247,19 +252,22 @@
             enemy.setVelocityX(enemy.speedX)
             if (enemy.speedX>0){
               enemy.anims.play('walk_enemy', true)
+              enemy.flipX = false
 
+            }else{
+              enemy.flipX = true
             }
               // enemy.setVelocityX(-200)
-              // enemy.flipX = false
+
           })
         }
         if (this.cursors.left.isDown) {
           player.anims.play('walk', true)
-          player.setVelocityX(-500)
+          player.setVelocityX(-200)
           player.flipX = true
         }else if (this.cursors.right.isDown) {
           player.anims.play('walk', true)
-          player.setVelocityX(500)
+          player.setVelocityX(200)
           player.flipX = false
         } else {
           player.anims.play('idle',true)
@@ -268,7 +276,7 @@
 
         if (this.cursors.up.isDown && player.body.onFloor()) {
           player.setFrame()
-          player.setVelocityY(-900)
+          player.setVelocityY(-300)
         }
         if(player.body.velocity.y < 0){
           player.setFrame(14)
