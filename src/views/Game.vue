@@ -25,6 +25,8 @@
     let scoreText;
     let emitter;
     let soundEat
+    let lives = 3;
+    let livesText;
 
     function changeDirection (enemy) {
       enemy.speedX*=-1
@@ -37,10 +39,6 @@
       })
     }
     function  takeCoin(player, coin) {
-      // coin.destroy(coin.x,coin.y)
-      // coinScore++
-      // text.setText(`Coins: ${coinScore}-16`)
-      // return false
       coin.disableBody(true,true)
       coinScore+=10
       scoreText.setText('Score: '+coinScore)
@@ -61,32 +59,12 @@
       })
     }
     function lesslive (player, enemy) {
-      this.explosionMobileEnemy = this.physics.add.sprite(player.body.x + player.body.height / 2, player.body.y + player.body.width / 2, 'explosionMobileEnemy')
-      // TODO: Simular la explosió --done
-
-      this.explosionMobileEnemy.anims.play('splash_enemy', true)
 
       lives = lives - 1
-      let livesAux = lives
-      let scoreAux = score
-      player.disableBody(true, true)
+      // player.disableBody(true, true)
+      livesText.setText('Lives : '+lives)
+      player.scene.cameras.main.shake(500)
 
-      soundDead.play()
-
-      // TODO REINICIAR NIVELL --done
-      // player.scene.cameras.main.shake(500)
-      // score = 0
-      // if (lives > 0) {
-      if (lives > 0) {
-        this.scene.restart()
-        lives = livesAux
-        score = scoreAux
-      } else {
-        score = scoreAux
-
-        this.gameOverText.setVisible(true)
-        this.mobileEnemy.disableBody(true, true)
-      }
     }
 
     export default {
@@ -121,7 +99,7 @@
         var progressBar = this.add.graphics()
         var progressBox = this.add.graphics()
         progressBox.fillStyle(0x222222, 0.8)
-        progressBox.fillRect(240, 270, 320, 50)
+        progressBox.fillRect(545, 320, 320, 50)
         var width = this.cameras.main.width
         var height = this.cameras.main.height
         var loadingText = this.make.text({
@@ -158,7 +136,7 @@
           percentText.setText(parseInt(value * 100) + '%')
           progressBar.clear()
           progressBar.fillStyle(0xffffff, 1)
-          progressBar.fillRect(250, 280, 300 * value, 30)
+          progressBar.fillRect(550, 330, 300 * value, 30)
         })
         this.load.on('fileprogress', function (file) {
           assetText.setText('Loading asset: ' + file.key)
@@ -195,7 +173,6 @@
       create(){
         camera = this.cameras.main;
         console.log("CREATED");
-
 
 
         //musica
@@ -276,23 +253,34 @@
           frameRate: 12,
           repeat: -1
         });
-
+        this.anims.create({
+          key: 'shotting',
+          frames: this.anims.generateFrameNames('player', {
+            frames: [45,46,47,48,49,50,51,52,53,54,55,56,57]
+          }),
+          frameRate: 51,
+          repeat: -1
+        });
         createCoins()
         createEnemies()
 
         this.physics.add.collider(player,walls)
         this.physics.add.collider(enemies,walls)
         this.physics.add.collider(enemies,collision,changeDirection)
+        this.physics.add.collider(player,enemies,lesslive)
         this.physics.add.overlap(player,coins,takeCoin,null,this)
 
         camera.setZoom(2)
         camera.startFollow(player)
 
-        scoreText=this.add.text(camera.centerX-350,camera.centerY-180,'Score: 0',{fontSize:'18px',fill:'#000'})
+        scoreText=this.add.text(camera.centerX-350,camera.centerY-170,'Score: 0',{fontSize:'18px',fill:'#000'})
         scoreText.setColor('#ffffff')
         scoreText.setScrollFactor(0)
 
-        music.play()
+        livesText=this.add.text(camera.centerX-350,camera.centerY-150,'Lives : 3',{fontSize:'18px',fill:'#000'})
+        livesText.setColor('#ffffff')
+        livesText.setScrollFactor(0)
+        // music.play()
 
       }
       update(){
@@ -302,7 +290,6 @@
             if (enemy.speedX>0){
               enemy.anims.play('walk_enemy', true)
               enemy.flipX = false
-
             }else{
               enemy.flipX = true
             }
@@ -334,6 +321,7 @@
           player.setFrame(17)
           player.body.setMaxVelocity(400, 550);
         }
+
       }
     }
 
