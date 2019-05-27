@@ -12,6 +12,7 @@
     import _PARTICLES from '../assets/particles/rain.png'
     //sounds
     import _GAME_MUSIC from '../assets/sounds/wapons.mp3'
+    import _SOUND_EAT from '../assets/sounds/eat.mp3'
 
 
     let camera;
@@ -23,7 +24,7 @@
     let coinScore = 0;
     let scoreText;
     let emitter;
-    let imageData = new Image();
+    let soundEat
 
     function changeDirection (enemy) {
       enemy.speedX*=-1
@@ -33,7 +34,6 @@
         let obj = coins.create(object.x, object.y, 'objects',243)
         obj.body.width = object.width
         obj.body.height = object.height
-        // obj.anims.play('spin', coins)
       })
     }
     function  takeCoin(player, coin) {
@@ -44,6 +44,7 @@
       coin.disableBody(true,true)
       coinScore+=10
       scoreText.setText('Score: '+coinScore)
+      soundEat.play()
       // console.log(scoreText);
 
     }
@@ -58,6 +59,34 @@
         obj.speedX = 50
 
       })
+    }
+    function lesslive (player, enemy) {
+      this.explosionMobileEnemy = this.physics.add.sprite(player.body.x + player.body.height / 2, player.body.y + player.body.width / 2, 'explosionMobileEnemy')
+      // TODO: Simular la explosió --done
+
+      this.explosionMobileEnemy.anims.play('splash_enemy', true)
+
+      lives = lives - 1
+      let livesAux = lives
+      let scoreAux = score
+      player.disableBody(true, true)
+
+      soundDead.play()
+
+      // TODO REINICIAR NIVELL --done
+      // player.scene.cameras.main.shake(500)
+      // score = 0
+      // if (lives > 0) {
+      if (lives > 0) {
+        this.scene.restart()
+        lives = livesAux
+        score = scoreAux
+      } else {
+        score = scoreAux
+
+        this.gameOverText.setVisible(true)
+        this.mobileEnemy.disableBody(true, true)
+      }
     }
 
     export default {
@@ -149,6 +178,7 @@
         // this.load.spritesheet('rain',_PARTICLES,{frameWidth:17,frameHeight:17})
 
         this.load.audio('sound',_GAME_MUSIC)
+        this.load.audio('eat',_SOUND_EAT)
 
       }
       create () {
@@ -169,7 +199,9 @@
 
 
         //musica
-        let sound = this.sound.add('sound', { loop: true })
+        let music = this.sound.add('sound', { loop: true })
+        //Souns
+        soundEat = this.sound.add('eat', {loop: false})
         // sound.play()
 
         let map = this.make.tilemap({ key: "map" })
@@ -260,7 +292,7 @@
         scoreText.setColor('#ffffff')
         scoreText.setScrollFactor(0)
 
-        sound.play()
+        music.play()
 
       }
       update(){
