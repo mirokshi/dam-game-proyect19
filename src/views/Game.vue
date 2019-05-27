@@ -4,12 +4,12 @@
   <script>
     /* eslint-disable */
     import Phaser from 'phaser'
-    import _IMG_LOADING from '../assets/gamepad.png'
     import _TILESET_SET from '../assets/tileSets/tileset.png'
     import _JSON_MAP from '../assets/tileSets/mapa.json'
     import _PLAYER from '../assets/characters/cyclops.png'
     import _ENEMIES from '../assets/characters/imp.png'
     import _OBJECTS from '../assets/objects/objects.png'
+    import _PARTICLES from '../assets/particles/rain.png'
     //sounds
     import _GAME_MUSIC from '../assets/sounds/wapons.mp3'
 
@@ -22,7 +22,8 @@
     let enemies;
     let coinScore = 0;
     let scoreText;
-
+    let emitter;
+    let imageData = new Image();
 
     function changeDirection (enemy) {
       enemy.speedX*=-1
@@ -145,7 +146,7 @@
         this.load.spritesheet('player',_PLAYER ,{ frameWidth: 64, frameHeight: 64 })
         this.load.spritesheet('objects',_OBJECTS ,{ frameWidth: 32, frameHeight: 32 })
         this.load.spritesheet('enemy',_ENEMIES ,{ frameWidth: 32, frameHeight: 32 })
-        // this.load.image('spark', Spark)
+        // this.load.spritesheet('rain',_PARTICLES,{frameWidth:17,frameHeight:17})
 
         this.load.audio('sound',_GAME_MUSIC)
 
@@ -164,7 +165,8 @@
       create(){
         camera = this.cameras.main;
         console.log("CREATED");
-        let logo = this.add.image(300,300,'logo')
+
+
 
         //musica
         let sound = this.sound.add('sound', { loop: true })
@@ -190,7 +192,22 @@
         backgroundS.setCollisionByExclusion([-1]);
         details.setCollisionByExclusion([-1]);
         walls.setCollisionByExclusion([-1]);
-        // walls.setCollisionBetween(0,1999)
+
+        // //Particles ->rain
+        // emitter= this.add.emitter(this.world.centerX,0,400);
+        // emitter.width = this.world.width;
+        // emitter.makeParticles('rain');
+        //
+        // emitter.minParticleScale = 0.1;
+        // emitter.maxParticleScale = 0.5;
+        //
+        // emitter.setYSpeed(300, 500);
+        // emitter.setXSpeed(-5, 5);
+        //
+        // emitter.minRotation = 0;
+        // emitter.maxRotation = 0;
+        //
+        // emitter.start(false, 1600, 5, 0);
 
         // La càmara no sortirà del món
         camera.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
@@ -200,7 +217,6 @@
         player = this.physics.add.sprite(spawnpoint.x, spawnpoint.y, 'player');
         player.body.setSize(24, 64, 40, 0)
         player.lives = 3;
-
         // Habilitem un cursor per a les fletxes del teclat
         this.cursors = this.input.keyboard.createCursorKeys();
         //Animacion parado
@@ -240,10 +256,11 @@
         camera.setZoom(2)
         camera.startFollow(player)
 
-        scoreText=this.add.text(16,16,'Score: 0',{fontSize:'32px',fill:'#000'})
+        scoreText=this.add.text(camera.centerX-350,camera.centerY-180,'Score: 0',{fontSize:'18px',fill:'#000'})
         scoreText.setColor('#ffffff')
         scoreText.setScrollFactor(0)
 
+        sound.play()
 
       }
       update(){
