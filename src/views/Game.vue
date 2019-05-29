@@ -11,7 +11,10 @@
     import _ENEMIES from '../assets/characters/imp.png'
     import _OBJECTS from '../assets/objects/objects.png'
     import _DEMON from '../assets/characters/demon160x128.png'
-    import _PARTICLES from '../assets/particles/pp/circle_01.png'
+    import _PARTICLES from '../assets/particles/pp/fire_01.png'
+    import _PARTICLES_JSON from '../assets/particles/game/shapes.json'
+    import _PARTICLES_TWO from '../assets/particles/game/shapes.png'
+
     //sounds
     import _GAME_MUSIC from '../assets/sounds/wapons.mp3'
     import _SOUND_EAT from '../assets/sounds/eat.mp3'
@@ -21,7 +24,7 @@
     let coins,CoinLayer,coinScore = 0;
     let EnemyLayer, enemies;
     let scoreText;
-    let particles, emitter;
+    let emitter;
     let soundEat
     let lives = 3,livesText;
     function changeDirection (enemy) {
@@ -158,7 +161,7 @@
         // this.load.spritesheet('rain',_PARTICLES,{frameWidth:17,frameHeight:17})
 
         this.load.image('particles',_PARTICLES)
-
+        this.load.atlas('test',_PARTICLES_TWO,_PARTICLES_JSON)
         this.load.audio('sound',_GAME_MUSIC)
         this.load.audio('eat',_SOUND_EAT)
 
@@ -224,18 +227,49 @@
         // Habilitar flechas
         this.cursors = this.input.keyboard.createCursorKeys();
 
-        particles = this.add.particles('particles');
 
-        emitter = particles.createEmitter({
-          x:player.body.x + player.body.width /2 ,
-          y: player.body.y + player.body.height,
-          angle: { min: 140, max: 180 },
-          speed: 200,
-          gravityY: 300,
-          scale: { start: 0.1, end: 0 },
-          lifespan: { min: 500, max: 1000 },
-          blendMode: 'ADD'
-        })
+        var particlescollapse = this.add.particles('test')
+          particlescollapse.createEmitter({
+            "active":true,
+            "visible":true,
+            "collideBottom":true,
+            "collideLeft":true,
+            "collideRight":true,
+            "collideTop":true,
+            "on":true,
+            "particleBringToTop":true,
+            "radial":true,
+            "frame":{
+              "frames":["dirt_01"],
+              "cycle":false,"quantity":1
+            },
+            "frequency":1,
+            "gravityX":0,
+            "gravityY":400,
+            "maxParticles":0,
+            "timeScale":1,
+            "blendMode":1,
+            "accelerationX":0,
+            "accelerationY":0,
+            "alpha":1,
+            "angle":{"min":0,"max":360,"ease":"Linear"},
+            "bounce":0,
+            "delay":0,
+            "lifespan":1000,
+            "maxVelocityX":10000,
+            "maxVelocityY":10000,
+            "moveToX":0,
+            "moveToY":0,
+            "quantity":1,
+            "rotate":0,
+            "scale":1,
+            "speed":0,
+            "x":50,
+            "y":100,
+            "tint":[3091757],
+            "emitZone":{"source":new Phaser.Geom.Rectangle(0,0,7000,50),"type":"random"},
+            "deathZone":{"source":new Phaser.Geom.Rectangle(0,300,7000,50),"type":"onEnter"}
+          });
 
         //Animacion parado
         this.anims.create({
@@ -323,16 +357,16 @@
           player.anims.play('walk', true)
           player.setVelocityX(-200)
           player.flipX = true
-          emitter.setPosition(player.body.x + player.body.width, player.body.y + player.body.height)
+          // emitter.setPosition(player.body.x + player.body.width, player.body.y + player.body.height)
         }else if (this.cursors.right.isDown) {
           player.anims.play('walk', true)
           player.setVelocityX(200)
           player.flipX = false
-          emitter.setPosition(player.body.x, player.body.y + player.body.height)
+          // emitter.setPosition(player.body.x, player.body.y + player.body.height)
         } else {
           player.anims.play('idle',true)
           player.setVelocityX(0)
-          emitter.setPosition(player.body.x + player.body.width / 2, player.body.y + player.body.height)
+          // emitter.setPosition(player.body.x + player.body.width / 2, player.body.y + player.body.height)
         }
 
         if (this.cursors.up.isDown && player.body.onFloor()) {
@@ -357,14 +391,14 @@
       }
       create(){
         camera = this.cameras.main;
-        console.log("CREATED");
+        console.log('CREATED');
 
 
         //musica
-        let music = this.sound.add('sound', { loop: true })
+        let sound = this.sound.add('sound', { loop: true })
         //Souns
         soundEat = this.sound.add('eat', {loop: false})
-        // sound.play()
+        sound.play()
 
         let map = this.make.tilemap({ key: "map2" })
         let tileset = map.addTilesetImage("tileset", "tileset")
