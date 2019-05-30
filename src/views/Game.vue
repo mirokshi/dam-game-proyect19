@@ -11,16 +11,23 @@
     import _ENEMIES from '../assets/characters/imp.png'
     import _OBJECTS from '../assets/objects/objects.png'
     import _DEMON from '../assets/characters/demon160x128.png'
-    import _PARTICLES_ARROW from '../assets/particles/arrow.png'
-    import _PARTICLES_JSON from '../assets/particles/game/shapes.json'
-    import _PARTICLES_COLLAPSE from '../assets/particles/game/shapes.png'
     import _BUTTONS from '../assets/objects/button.png'
     import _START from '../assets/img/game.png'
-    import _END from '../assets/img/gameOver.png'
+    import _END from '../assets/img/lose.png'
+    import _WIN from '../assets/img/gameWinner.jpg'
+    //particles
+    import _PARTICLES_ARROW from '../assets/particles/arrow.png'
+    import _PARTICLES_JSON from '../assets/particles/game/shapes.json'
+    import _PARTICLES from '../assets/particles/game/shapes.png'
+
+
     //sounds
     import _GAME_MUSIC from '../assets/sounds/wapons.mp3'
     import _SOUND_EAT from '../assets/sounds/eat.mp3'
-
+    import _SOUND_JUMP from '../assets/sounds/jump.wav'
+    import _SOUND_DAMAGE from '../assets/sounds/damage.wav'
+    import _SOUND_LOSE from '../assets/sounds/lose.wav'
+    import _SOUND_WIN from '../assets/sounds/win.mp3'
 
     let camera, player;
     let coins,CoinLayer,coinScore = 0;
@@ -28,13 +35,9 @@
     let DemonLayer, demons;
     let scoreText;
     let emitter;
-    let soundEat
-    let lives = 3,livesText;
-    let button, bgStart, bgEnd;
-
-    function actionOnClick() {
-      this.scene.start('inGame')
-    }
+    let soundEat,soundJump,soundDamage,soundLose,soundWin,music;
+    let livesText;
+    let button, bgStart, bgEnd,bgWin;
 
     function changeDirection (enemy) {
       enemy.speedX*=-1
@@ -80,19 +83,28 @@
     }
 
     function lesslive (player, enemy) {
-      lives = lives - 1
-      player.scene.cameras.main.shake(250)
-      player.x =150
-      player.y=150
+      player.lives = player.lives - 1;
+      player.scene.cameras.main.shake(250);
+      player.x =150;
+      player.y=150;
       // player.disableBody(true, true)
-      livesText.setText('Lives : '+lives)
-      if (lives === 0){
-        this.scene.start('gameOver')
-      }
+      livesText.setText('Lives : '+player.lives);
+      soundDamage.play();
     }
+
     function winGame1(){
-      this.scene.start('inGame2')
+      this.scene.start('inGame2');
     }
+    function winGame(){
+      music.pause();
+      this.scene.start('win');
+      soundWin.play();
+    }
+    function restartGame() {
+      soundWin.pause();
+      this.scene.start('inGame');
+    }
+
 
     export default {
       name: 'Game',
@@ -102,8 +114,13 @@
         // PHASER 3.0 -> phaser
         let config = {
           type: Phaser.AUTO,
-          width: window.innerWidth,
-          height: window.innerHeight,
+          scale: {
+            mode: Phaser.Scale.FIT,
+            parent: 'game',
+            autoCenter: Phaser.Scale.CENTER_BOTH,
+            width: window.innerWidth,
+            height: window.innerHeight
+          },
           physics: {
             default: 'arcade',
             arcade: {
@@ -112,7 +129,7 @@
             }
           },
           // NO HI HA STATES A 3.0 -> SCENES
-          scene: [loader,gameStart, inGame, inGame2,gameOver]
+          scene: [loader,gameStart, inGame, inGame2,win,gameOver]
         }
         // eslint-disable-next-line
         new Phaser.Game(config)
@@ -183,16 +200,23 @@
         this.load.spritesheet('enemy',_ENEMIES ,{ frameWidth: 32, frameHeight: 32 })
         this.load.spritesheet('demon',_DEMON ,{ frameWidth: 160, frameHeight: 128 })
 
-        //btn
+        //bg
         this.load.image('bgStart',_START)
         this.load.image('bgEnd',_END)
+        this.load.image('bgWin',_WIN)
+        //btn
         this.load.spritesheet('buttons',_BUTTONS,{frameWidth:16,frameHeight:16})
         //pa
-        this.load.atlas('collapse',_PARTICLES_COLLAPSE,_PARTICLES_JSON)
+        this.load.atlas('collapse',_PARTICLES,_PARTICLES_JSON)
+        this.load.atlas('winParticles',_PARTICLES,_PARTICLES_JSON)
         this.load.image('arrow',_PARTICLES_ARROW)
         //so
         this.load.audio('sound',_GAME_MUSIC)
         this.load.audio('eat',_SOUND_EAT)
+        this.load.audio('jump',_SOUND_JUMP)
+        this.load.audio('damage',_SOUND_DAMAGE)
+        this.load.audio('lose',_SOUND_LOSE)
+        this.load.audio('win',_SOUND_WIN)
 
       }
       create () {
@@ -208,9 +232,22 @@
         console.log('PRELOAD GAME START');
       }
       create(){
-          bgStart = this.add.tileSprite(window.x/2,window.y/2,1390,920,'bgStart').setOrigin(0)
-                // button = this.add.button(300,400,'buttons',actionOnClick,this,2,1,0)
+        console.log('CREATED GAME START');
+
+        bgStart = this.add.image(0,0,'bgStart').setOrigin(0).setDepth()
+        bgStart.displayHeight = this.game.renderer.height
+        bgStart.displayWidth = this.game.renderer.width
+
+        const startButton = this.add.sprite(100,450,'buttons',1)
+                .setInteractive()
+                .on('pointerdown', () => this.scene.start('inGame'));
+          startButton.setScale(4)
+        const soundButton = this.add.sprite(window.x,window.y,'buttons',13)
+                .setInteractive()
+                .on('pointerdown',() => music.pause())
+        soundButton.setScale(4)
       }
+
     }
     class gameOver extends Phaser.Scene{
       constructor(){
@@ -220,7 +257,94 @@
         console.log('PRELOAD GAME OVER');
       }
       create(){
-        bgEnd = this.add.tileSprite(window.x/2,window.y/2,718,479,'bgEnd').setOrigin(0)
+        console.log('CREATED GAME OVER');
+
+        bgEnd = this.add.image(0,0,'bgEnd').setOrigin(0).setDepth()
+        bgEnd.displayHeight = this.game.renderer.height
+        bgEnd.displayWidth = this.game.renderer.width
+        const restartButton = this.add.sprite(100,450,'buttons',3)
+                .setInteractive()
+                .on('pointerdown', () => this.scene.start('inGame'));
+        restartButton.setScale(4)
+      }
+    }
+    class win extends Phaser.Scene{
+      constructor(){
+        super({key:'win'})
+      }
+      preload(){
+        console.log('PRELOAD WIN');
+      }
+      create() {
+        console.log('CREATED WIN');
+
+        bgWin = this.add.image(0,0,'bgWin').setOrigin(0).setDepth()
+        bgWin.displayHeight = this.game.renderer.height
+        bgWin.displayWidth = this.game.renderer.width
+        const restartButton = this.add.sprite(100,450,'buttons',3)
+                .setInteractive()
+                .on('pointerdown', () => this.scene.start('inGame') && soundWin.pause());
+        restartButton.setScale(4)
+        let particleswin = this.add.particles('winParticles')
+        particleswin.createEmitter({
+          "active":true,
+          "visible":true,
+          "collideBottom":true,
+          "collideLeft":true,
+          "collideRight":true,
+          "collideTop":true,
+          "on":true,
+          "particleBringToTop":true,
+          "radial":true,
+          "frame":{"frames":["symbol_02"],
+            "cycle":false,
+            "quantity":1},
+          "frequency":0,
+          "gravityX":0,
+          "gravityY":0,
+          "maxParticles":0,
+          "timeScale":0.5,
+          "blendMode":3,
+          "accelerationX":0,
+          "accelerationY":0,
+          "alpha":1,
+          "angle":{"min":0,
+            "max":360,
+            "ease":"Linear"},
+          "bounce":{"ease":"Linear",
+            "min":1,
+            "max":500},
+          "delay":{"ease":"Linear",
+            "min":1,
+            "max":500},
+          "lifespan":{"ease":"Linear",
+            "min":1,
+            "max":50000},
+          "maxVelocityX":{"start":0,
+            "end":0,
+            "ease":"Linear"},
+          "maxVelocityY":10000,
+          "moveToX":0,
+          "moveToY":0,
+          "quantity":1,
+          "rotate":0,
+          "scale":{"ease":"Linear",
+            "min":1,
+            "max":2},
+          "speed":{"ease":"Linear",
+            "min":1,
+            "max":500},
+          "x":{"ease":"Linear",
+            "min":0,
+            "max":3000},
+          "y":{"ease":"Linear",
+            "min":1,
+            "max":3000},
+          "tint":[11142573,
+            7441958,
+            3893608,
+            12013648],
+          "emitZone":{"source":new Phaser.Geom.Circle(0,0,600),"type":"random"}})
       }
     }
     class inGame extends Phaser.Scene{
@@ -228,18 +352,21 @@
         super({key:'inGame'})
       }
       preload(){
-        console.log('PRELOAD');
+        console.log('PRELOAD IN GAME');
       }
       create(){
         camera = this.cameras.main;
-        console.log("CREATED");
-
+        console.log("CREATED IN GAME");
 
         //musica
-        let music = this.sound.add('sound', { loop: true })
+        music = this.sound.add('sound', { loop: true })
         //Souns
         soundEat = this.sound.add('eat', {loop: false})
-        // sound.play()
+        soundJump = this.sound.add('jump',{loop:false})
+        soundDamage = this.sound.add('damage',{loop:false})
+        soundLose = this.sound.add('lose',{loop:false})
+        soundWin = this.sound.add('win',{loop:false})
+        soundWin.pause()
 
         let map = this.make.tilemap({ key: "map" })
         let tileset = map.addTilesetImage("tileset", "tileset")
@@ -271,10 +398,8 @@
         player.body.setSize(24, 64, 40, 0)
         player.lives = 3;
 
-
         // Habilitar flechas
         this.cursors = this.input.keyboard.createCursorKeys();
-
 
         var particlescollapse1 = this.add.particles('collapse')
           particlescollapse1.createEmitter({
@@ -403,6 +528,8 @@
           "deathZone":{"source":new Phaser.Geom.Rectangle(0,100,7000,50),"type":"onEnter"}
         });
 
+
+
         var particles = this.add.particles('arrow')
         emitter = particles.createEmitter({
           x: 1080,
@@ -441,7 +568,6 @@
         createCoins()
         createEnemies()
 
-
         this.physics.add.collider(player,walls)
         this.physics.add.collider(player,enemies,lesslive)
         this.physics.add.collider(player,end,winGame1,null,this)
@@ -459,10 +585,16 @@
         livesText=this.add.text(camera.centerX-350,camera.centerY-150,'Lives : 3',{fontSize:'18px',fill:'#000'})
         livesText.setColor('#ffffff')
         livesText.setScrollFactor(0)
-        // music.play()
+        music.play()
 
       }
       update(){
+        if (player.lives ===0){
+          console.log(player.lives);
+          this.scene.start('gameOver')
+          music.pause();
+          soundLose.play();
+        }
         if (enemies){
           enemies.children.entries.forEach(function (enemy) {
             enemy.setVelocityX(enemy.speedX)
@@ -492,6 +624,7 @@
         if (this.cursors.up.isDown && player.body.onFloor()) {
           player.setFrame(14)
           player.setVelocityY(-300)
+          soundJump.play();
         }
         if(player.body.velocity.y < 0){
           player.setFrame(14)
@@ -507,17 +640,20 @@
         super({key:'inGame2'})
       }
       preload(){
-        console.log('PRELOAD');
+        console.log('PRELOAD GAME 2');
       }
       create(){
         camera = this.cameras.main;
-        console.log('CREATED');
+        console.log('CREATED GAME 2');
 
 
         //musica
-        let sound = this.sound.add('sound', { loop: true })
+        music = this.sound.add('sound', { loop: true })
         //Souns
         soundEat = this.sound.add('eat', {loop: false})
+        soundJump = this.sound.add('jump',{loop:false})
+        soundDamage = this.sound.add('damage',{loop:false})
+        soundLose = this.sound.add('lose',{loop:false})
         // sound.play()
 
         let map = this.make.tilemap({ key: "map2" })
@@ -535,7 +671,6 @@
         coins = this.physics.add.staticGroup()
         enemies = this.physics.add.group()
         demons = this.physics.add.group()
-        // enemies.enableBody=true;
 
         backgroundP.setCollisionByExclusion([-1]);
         end.setCollisionByExclusion([-1]);
@@ -543,7 +678,6 @@
         backgroundS.setCollisionByExclusion([-1]);
         details.setCollisionByExclusion([-1]);
         walls.setCollisionByExclusion([-1]);
-
 
 
         // La càmara no sortirà del món
@@ -554,6 +688,7 @@
         player = this.physics.add.sprite(spawnpoint.x, spawnpoint.y, 'player');
         player.body.setSize(24, 64, 40, 0)
         player.lives = 3;
+
 
         // Habilitar flechas
         this.cursors = this.input.keyboard.createCursorKeys();
@@ -597,11 +732,10 @@
 
         this.physics.add.collider(player,walls)
         this.physics.add.collider(player,enemies,lesslive)
-        this.physics.add.collider(player,end)
         this.physics.add.overlap(player,coins,takeCoin,null,this)
+        this.physics.add.collider(player,end,winGame,null,this)
         this.physics.add.collider(enemies,walls)
         this.physics.add.collider(enemies,collision,changeDirection)
-        this.physics.add.collider(demons,walls)
         this.physics.add.collider(demons,player)
         this.physics.add.collider(demons,collision,changeDirection)
 
@@ -615,10 +749,15 @@
         livesText=this.add.text(camera.centerX-350,camera.centerY-150,'Lives : 3',{fontSize:'18px',fill:'#000'})
         livesText.setColor('#ffffff')
         livesText.setScrollFactor(0)
-        // music.play()
+        music.play()
 
       }
       update(){
+        if (player.lives ===0) {
+          console.log(player.lives);
+          this.scene.start('gameOver')
+          music.pause();
+        }
         if (enemies){
           enemies.children.entries.forEach(function (enemy) {
             enemy.setVelocityX(enemy.speedX)
