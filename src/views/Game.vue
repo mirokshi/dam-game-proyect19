@@ -13,8 +13,8 @@
     import _DEMON from '../assets/characters/demon160x128.png'
     import _BUTTONS from '../assets/objects/button.png'
     import _START from '../assets/img/game.png'
-    import _END from '../assets/img/lose.png'
-    import _WIN from '../assets/img/gameWinner.jpg'
+    import _END from '../assets/img/lose.jpg'
+    import _WIN from '../assets/img/win.png'
     //particles
     import _PARTICLES_ARROW from '../assets/particles/arrow.png'
     import _PARTICLES_JSON from '../assets/particles/game/shapes.json'
@@ -36,6 +36,7 @@
     let scoreText;
     let emitter;
     let soundEat,soundJump,soundDamage,soundLose,soundWin,music;
+    let musicOn=true;
     let livesText;
     let button, bgStart, bgEnd,bgWin;
 
@@ -85,27 +86,21 @@
     function lesslive (player, enemy) {
       player.lives = player.lives - 1;
       player.scene.cameras.main.shake(250);
-      player.x =150;
+      player.x =250;
       player.y=150;
       // player.disableBody(true, true)
       livesText.setText('Lives : '+player.lives);
       soundDamage.play();
     }
-
     function winGame1(){
+      music.pause()
       this.scene.start('inGame2');
     }
     function winGame(){
       music.pause();
       this.scene.start('win');
-      soundWin.play();
-    }
-    function restartGame() {
-      soundWin.pause();
-      this.scene.start('inGame');
-    }
 
-
+    }
     export default {
       name: 'Game',
       created() {
@@ -200,6 +195,9 @@
         this.load.spritesheet('enemy',_ENEMIES ,{ frameWidth: 32, frameHeight: 32 })
         this.load.spritesheet('demon',_DEMON ,{ frameWidth: 160, frameHeight: 128 })
 
+        //joystick
+        this.load.plugin('rexvirtualjoystickplugin', 'https://raw.githubusercontent.com/rexrainbow/phaser3-rex-notes/master/plugins/dist/rexvirtualjoystickplugin.min.js', true)
+
         //bg
         this.load.image('bgStart',_START)
         this.load.image('bgEnd',_END)
@@ -238,14 +236,25 @@
         bgStart.displayHeight = this.game.renderer.height
         bgStart.displayWidth = this.game.renderer.width
 
-        const startButton = this.add.sprite(100,450,'buttons',1)
+        const startButton = this.add.sprite(this.game.renderer.width / 2 - 100, this.game.renderer.height / 2,'buttons',1)
                 .setInteractive()
                 .on('pointerdown', () => this.scene.start('inGame'));
-          startButton.setScale(4)
-        const soundButton = this.add.sprite(window.x,window.y,'buttons',13)
+          startButton.displayHeight =40
+          startButton.displayWidth =40
+
+        const soundButton = this.add.sprite(this.game.renderer.width / 2 + 100, this.game.renderer.height / 2,'buttons',13)
                 .setInteractive()
-                .on('pointerdown',() => music.pause())
-        soundButton.setScale(4)
+                .on('pointerdown',() =>{
+                          musicOn=false
+                })
+        soundButton.displayHeight =40
+        soundButton.displayWidth =40
+
+        if (this.sys.game.device.os.desktop) {
+          startButton.setScale(4)
+          soundButton.setScale(4)
+        }
+
       }
 
     }
@@ -258,14 +267,21 @@
       }
       create(){
         console.log('CREATED GAME OVER');
-
+        soundLose = this.sound.add('lose',{loop:false})
+        soundLose.play()
         bgEnd = this.add.image(0,0,'bgEnd').setOrigin(0).setDepth()
         bgEnd.displayHeight = this.game.renderer.height
         bgEnd.displayWidth = this.game.renderer.width
-        const restartButton = this.add.sprite(100,450,'buttons',3)
+
+        const restartButton = this.add.sprite(this.game.renderer.width / 2, this.game.renderer.height / 2+150,'buttons',3)
                 .setInteractive()
                 .on('pointerdown', () => this.scene.start('inGame'));
-        restartButton.setScale(4)
+
+        if (this.sys.game.device.os.desktop) {
+          restartButton.setScale(1)
+        }
+        restartButton.displayWidth=40
+        restartButton.displayHeight=40
       }
     }
     class win extends Phaser.Scene{
@@ -277,14 +293,23 @@
       }
       create() {
         console.log('CREATED WIN');
+        soundWin = this.sound.add('win',{loop:false})
+        soundWin.play()
 
         bgWin = this.add.image(0,0,'bgWin').setOrigin(0).setDepth()
         bgWin.displayHeight = this.game.renderer.height
         bgWin.displayWidth = this.game.renderer.width
-        const restartButton = this.add.sprite(100,450,'buttons',3)
+
+        const restartButton = this.add.sprite(this.game.renderer.width / 2, this.game.renderer.height / 2+150,'buttons',3)
                 .setInteractive()
-                .on('pointerdown', () => this.scene.start('inGame') && soundWin.pause());
-        restartButton.setScale(4)
+                .on('pointerdown', () => this.scene.start('inGame'));
+        // restartButton.setScale(6);
+        // if (this.sys.game.device.os.desktop) {
+        //   restartButton.setScale(2)
+        // }
+        restartButton.displayWidth=40
+        restartButton.displayHeight=40
+
         let particleswin = this.add.particles('winParticles')
         particleswin.createEmitter({
           "active":true,
@@ -364,9 +389,7 @@
         soundEat = this.sound.add('eat', {loop: false})
         soundJump = this.sound.add('jump',{loop:false})
         soundDamage = this.sound.add('damage',{loop:false})
-        soundLose = this.sound.add('lose',{loop:false})
-        soundWin = this.sound.add('win',{loop:false})
-        soundWin.pause()
+
 
         let map = this.make.tilemap({ key: "map" })
         let tileset = map.addTilesetImage("tileset", "tileset")
@@ -575,63 +598,112 @@
         this.physics.add.collider(enemies,walls)
         this.physics.add.collider(enemies,collision,changeDirection)
 
-        camera.setZoom(2)
+        if (this.sys.game.device.os.desktop) {
+          camera.setZoom(2)
+        }
         camera.startFollow(player)
 
-        scoreText=this.add.text(camera.centerX-350,camera.centerY-170,'Score: 0',{fontSize:'18px',fill:'#000'})
-        scoreText.setColor('#ffffff')
-        scoreText.setScrollFactor(0)
+        if (!this.sys.game.device.os.desktop) {
+          this.joyStick = this.plugins.get('rexvirtualjoystickplugin').add(this, {
+            x: this.cameras.main.centerX - 250,
+            y: this.cameras.main.centerY + 100,
+            radius: 40,
+            base: this.add.graphics().fillStyle(0x888888).fillCircle(0, 0, 50),
+            thumb: this.add.graphics().fillStyle(0xcccccc).fillCircle(0, 0, 30)
+          })
+          this.cursorKeysVirtual = this.joyStick.createCursorKeys()
+        }
 
-        livesText=this.add.text(camera.centerX-350,camera.centerY-150,'Lives : 3',{fontSize:'18px',fill:'#000'})
-        livesText.setColor('#ffffff')
-        livesText.setScrollFactor(0)
-        music.play()
+          if (!this.sys.game.device.os.desktop) {
+          //movil
+          scoreText=this.add.text(100,10,'Score: 0',{fontSize:'18px',fill:'#000'}).setScrollFactor(0).setDepth(200)
+          scoreText.setColor('#ffffff')
+          scoreText.setScrollFactor(0)
+          livesText=this.add.text(100,40,'Lives : 3',{fontSize:'18px',fill:'#000'}).setScrollFactor(0).setDepth(200)
+          livesText.setColor('#ffffff')
+          livesText.setScrollFactor(0)
+        }else{
+          scoreText=this.add.text((window.innerWidth / 3) - 100, (window.innerHeight / 4),'Score: 0',{fontSize:'18px',fill:'#000'}).setScrollFactor(0).setDepth(200)
+          scoreText.setColor('#ffffff')
+          scoreText.setScrollFactor(0)
+          livesText=this.add.text((window.innerWidth / 3) -100, (window.innerHeight / 4)+30,'Lives : 3',{fontSize:'18px',fill:'#000'}).setScrollFactor(0).setDepth(200)
+          livesText.setColor('#ffffff')
+          livesText.setScrollFactor(0)
+        }
+
+        if (musicOn === false){
+          music.pause()
+        } else{
+          music.play()
+        }
 
       }
-      update(){
-        if (player.lives ===0){
+      update() {
+        if (player.lives === 0) {
           console.log(player.lives);
           this.scene.start('gameOver')
           music.pause();
-          soundLose.play();
         }
-        if (enemies){
+        if (enemies) {
           enemies.children.entries.forEach(function (enemy) {
             enemy.setVelocityX(enemy.speedX)
-            if (enemy.speedX>0){
+            if (enemy.speedX > 0) {
               enemy.anims.play('walk_enemy', true)
               enemy.flipX = false
-            }else{
+            } else {
               enemy.flipX = true
             }
-              // enemy.setVelocityX(-200)
+            // enemy.setVelocityX(-200)
 
           })
         }
-        if (this.cursors.left.isDown) {
-          player.anims.play('walk', true)
-          player.setVelocityX(-200)
-          player.flipX = true
-        }else if (this.cursors.right.isDown) {
-          player.anims.play('walk', true)
-          player.setVelocityX(200)
-          player.flipX = false
-        } else {
-          player.anims.play('idle',true)
-          player.setVelocityX(0)
-        }
+        if (this.sys.game.device.os.desktop) {
+          if (this.cursors.left.isDown) {
+            player.anims.play('walk', true)
+            player.setVelocityX(-200)
+            player.flipX = true
+          } else if (this.cursors.right.isDown) {
+            player.anims.play('walk', true)
+            player.setVelocityX(200)
+            player.flipX = false
+          } else {
+            player.anims.play('idle', true)
+            player.setVelocityX(0)
+          }
 
-        if (this.cursors.up.isDown && player.body.onFloor()) {
-          player.setFrame(14)
-          player.setVelocityY(-300)
+          if (this.cursors.up.isDown && player.body.onFloor()) {
+            player.setFrame(14)
+            player.setVelocityY(-295)
+          }
+          if (player.body.velocity.y < 0) {
+            player.setFrame(14)
+          }
+          if (player.body.velocity.y > 0) {
+            player.setFrame(17)
+            player.body.setMaxVelocity(400, 550);
+          }
+        }else {
+          if (this.cursorKeysVirtual.left.isDown) {
+            player.anims.play('walk', true)
+            player.setVelocityX(-160)
+            player.flipX = true
+          } else if (this.cursorKeysVirtual.right.isDown) {
+            player.setVelocityX(160)
+            player.anims.play('walk', true)
+            player.flipX = false
+          } else {
+            player.anims.play('idle',true)
+            player.setVelocityX(0)
+
+          }
+          if (this.cursorKeysVirtual.up.isDown && player.body.onFloor()) {
+            player.setVelocityY(-295) // 340
+            player.isJumping = true
+            player.isJumpingAnimation = true
+          }
+        }
+        if (this.cursors.up.isDown && player.body.onFloor()>-300) {
           soundJump.play();
-        }
-        if(player.body.velocity.y < 0){
-          player.setFrame(14)
-        }
-        if(player.body.velocity.y > 0){
-          player.setFrame(17)
-          player.body.setMaxVelocity(400, 550);
         }
       }
     }
@@ -739,17 +811,33 @@
         this.physics.add.collider(demons,player)
         this.physics.add.collider(demons,collision,changeDirection)
 
-        camera.setZoom(2)
+        if (this.sys.game.device.os.desktop) {
+          camera.setZoom(2)
+        }
         camera.startFollow(player)
 
-        scoreText=this.add.text(camera.centerX-350,camera.centerY-170,'Score: 0',{fontSize:'18px',fill:'#000'})
-        scoreText.setColor('#ffffff')
-        scoreText.setScrollFactor(0)
+        if (!this.sys.game.device.os.desktop) {
+          //movil
+          scoreText=this.add.text(100,10,'Score: 0',{fontSize:'18px',fill:'#000'}).setScrollFactor(0).setDepth(200)
+          scoreText.setColor('#ffffff')
+          scoreText.setScrollFactor(0)
+          livesText=this.add.text(100,40,'Lives : 3',{fontSize:'18px',fill:'#000'}).setScrollFactor(0).setDepth(200)
+          livesText.setColor('#ffffff')
+          livesText.setScrollFactor(0)
+        }else{
+          scoreText=this.add.text((window.innerWidth / 3) - 100, (window.innerHeight / 4),'Score: 0',{fontSize:'18px',fill:'#000'}).setScrollFactor(0).setDepth(200)
+          scoreText.setColor('#ffffff')
+          scoreText.setScrollFactor(0)
+          livesText=this.add.text((window.innerWidth / 3) -100, (window.innerHeight / 4)+30,'Lives : 3',{fontSize:'18px',fill:'#000'}).setScrollFactor(0).setDepth(200)
+          livesText.setColor('#ffffff')
+          livesText.setScrollFactor(0)
+        }
 
-        livesText=this.add.text(camera.centerX-350,camera.centerY-150,'Lives : 3',{fontSize:'18px',fill:'#000'})
-        livesText.setColor('#ffffff')
-        livesText.setScrollFactor(0)
-        music.play()
+        if (musicOn === false){
+          music.pause()
+        } else{
+          music.play()
+        }
 
       }
       update(){
