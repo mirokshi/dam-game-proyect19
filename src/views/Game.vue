@@ -608,8 +608,8 @@
             x: this.cameras.main.centerX - 250,
             y: this.cameras.main.centerY + 100,
             radius: 40,
-            base: this.add.graphics().fillStyle(0x888888).fillCircle(0, 0, 50),
-            thumb: this.add.graphics().fillStyle(0xcccccc).fillCircle(0, 0, 30)
+            base: this.add.graphics().fillStyle(0x150000).fillCircle(0, 0, 50),
+            thumb: this.add.graphics().fillStyle(0xB45F06).fillCircle(0, 0, 30)
           })
           this.cursorKeysVirtual = this.joyStick.createCursorKeys()
         }
@@ -892,9 +892,9 @@
           }
 
           if (this.cursors.up.isDown && player.body.onFloor()) {
+            soundJump.play()
             player.setFrame(14)
             player.setVelocityY(-295)
-            soundJump.play()
           }
           if (player.body.velocity.y < 0) {
             player.setFrame(14)
@@ -918,9 +918,9 @@
 
           }
           if (this.cursorKeysVirtual.up.isDown && player.body.onFloor()) {
+            soundJump.play();
             player.setFrame(14)
             player.setVelocityY(-295)
-            soundJump.play();
           }
         }
       }
