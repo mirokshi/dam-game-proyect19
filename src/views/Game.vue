@@ -66,7 +66,7 @@
         // obj.setOrigin(0)
         obj.body.width = object.width
         obj.body.height = object.height
-        obj.speedX = 70
+        obj.speedX = 110
 
       })
     }
@@ -120,7 +120,7 @@
             default: 'arcade',
             arcade: {
               gravity: {y: 300},
-              debug :true
+              debug :false
             }
           },
           // NO HI HA STATES A 3.0 -> SCENES
@@ -277,11 +277,12 @@
                 .setInteractive()
                 .on('pointerdown', () => this.scene.start('inGame'));
 
-        if (this.sys.game.device.os.desktop) {
-          restartButton.setScale(1)
-        }
         restartButton.displayWidth=40
         restartButton.displayHeight=40
+
+        if (this.sys.game.device.os.desktop) {
+          restartButton.setScale(4)
+        }
       }
     }
     class win extends Phaser.Scene{
@@ -303,13 +304,12 @@
         const restartButton = this.add.sprite(this.game.renderer.width / 2, this.game.renderer.height / 2+150,'buttons',3)
                 .setInteractive()
                 .on('pointerdown', () => this.scene.start('inGame'));
-        // restartButton.setScale(6);
-        // if (this.sys.game.device.os.desktop) {
-        //   restartButton.setScale(2)
-        // }
+
         restartButton.displayWidth=40
         restartButton.displayHeight=40
-
+        if (this.sys.game.device.os.desktop) {
+          restartButton.setScale(4)
+        }
         let particleswin = this.add.particles('winParticles')
         particleswin.createEmitter({
           "active":true,
@@ -622,7 +622,7 @@
           livesText=this.add.text(100,40,'Lives : 3',{fontSize:'18px',fill:'#000'}).setScrollFactor(0).setDepth(200)
           livesText.setColor('#ffffff')
           livesText.setScrollFactor(0)
-        }else{
+          }else{
           scoreText=this.add.text((window.innerWidth / 3) - 100, (window.innerHeight / 4),'Score: 0',{fontSize:'18px',fill:'#000'}).setScrollFactor(0).setDepth(200)
           scoreText.setColor('#ffffff')
           scoreText.setScrollFactor(0)
@@ -660,11 +660,11 @@
         if (this.sys.game.device.os.desktop) {
           if (this.cursors.left.isDown) {
             player.anims.play('walk', true)
-            player.setVelocityX(-200)
+            player.setVelocityX(-160)
             player.flipX = true
           } else if (this.cursors.right.isDown) {
             player.anims.play('walk', true)
-            player.setVelocityX(200)
+            player.setVelocityX(160)
             player.flipX = false
           } else {
             player.anims.play('idle', true)
@@ -674,6 +674,7 @@
           if (this.cursors.up.isDown && player.body.onFloor()) {
             player.setFrame(14)
             player.setVelocityY(-295)
+            soundJump.play()
           }
           if (player.body.velocity.y < 0) {
             player.setFrame(14)
@@ -697,13 +698,10 @@
 
           }
           if (this.cursorKeysVirtual.up.isDown && player.body.onFloor()) {
+            player.setFrame(14)
             player.setVelocityY(-295) // 340
-            player.isJumping = true
-            player.isJumpingAnimation = true
+            soundJump.play();
           }
-        }
-        if (this.cursors.up.isDown && player.body.onFloor()>-300) {
-          soundJump.play();
         }
       }
     }
@@ -817,6 +815,17 @@
         camera.startFollow(player)
 
         if (!this.sys.game.device.os.desktop) {
+          this.joyStick = this.plugins.get('rexvirtualjoystickplugin').add(this, {
+            x: this.cameras.main.centerX - 250,
+            y: this.cameras.main.centerY + 100,
+            radius: 40,
+            base: this.add.graphics().fillStyle(0x888888).fillCircle(0, 0, 50),
+            thumb: this.add.graphics().fillStyle(0xcccccc).fillCircle(0, 0, 30)
+          })
+          this.cursorKeysVirtual = this.joyStick.createCursorKeys()
+        }
+
+        if (!this.sys.game.device.os.desktop) {
           //movil
           scoreText=this.add.text(100,10,'Score: 0',{fontSize:'18px',fill:'#000'}).setScrollFactor(0).setDepth(200)
           scoreText.setColor('#ffffff')
@@ -868,29 +877,51 @@
             }
           })
         }
-        if (this.cursors.left.isDown) {
-          player.anims.play('walk', true)
-          player.setVelocityX(-200)
-          player.flipX = true
-        }else if (this.cursors.right.isDown) {
-          player.anims.play('walk', true)
-          player.setVelocityX(200)
-          player.flipX = false
-        } else {
-          player.anims.play('idle',true)
-          player.setVelocityX(0)
-        }
+        if (this.sys.game.device.os.desktop) {
+          if (this.cursors.left.isDown) {
+            player.anims.play('walk', true)
+            player.setVelocityX(-160)
+            player.flipX = true
+          } else if (this.cursors.right.isDown) {
+            player.anims.play('walk', true)
+            player.setVelocityX(160)
+            player.flipX = false
+          } else {
+            player.anims.play('idle', true)
+            player.setVelocityX(0)
+          }
 
-        if (this.cursors.up.isDown && player.body.onFloor()) {
-          player.setFrame(14)
-          player.setVelocityY(-300)
-        }
-        if(player.body.velocity.y < 0){
-          player.setFrame(14)
-        }
-        if(player.body.velocity.y > 0){
-          player.setFrame(17)
-          player.body.setMaxVelocity(400, 550);
+          if (this.cursors.up.isDown && player.body.onFloor()) {
+            player.setFrame(14)
+            player.setVelocityY(-295)
+            soundJump.play()
+          }
+          if (player.body.velocity.y < 0) {
+            player.setFrame(14)
+          }
+          if (player.body.velocity.y > 0) {
+            player.setFrame(17)
+            player.body.setMaxVelocity(400, 550);
+          }
+        }else {
+          if (this.cursorKeysVirtual.left.isDown) {
+            player.anims.play('walk', true)
+            player.setVelocityX(-160)
+            player.flipX = true
+          } else if (this.cursorKeysVirtual.right.isDown) {
+            player.setVelocityX(160)
+            player.anims.play('walk', true)
+            player.flipX = false
+          } else {
+            player.anims.play('idle',true)
+            player.setVelocityX(0)
+
+          }
+          if (this.cursorKeysVirtual.up.isDown && player.body.onFloor()) {
+            player.setFrame(14)
+            player.setVelocityY(-295)
+            soundJump.play();
+          }
         }
       }
     }
