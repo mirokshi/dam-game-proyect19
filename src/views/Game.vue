@@ -224,7 +224,7 @@
 
       }
       create () {
-        this.scene.start('win')
+        this.scene.start('gameStart')
       }
     }
 
@@ -242,7 +242,7 @@
         bgStart.displayHeight = this.game.renderer.height
         bgStart.displayWidth = this.game.renderer.width
 
-        bgdungeon = this.add.image(this.game.renderer.width / 2 -250, this.game.renderer.height / 2-200,'dungeon').setOrigin(0).setDepth()
+        bgdungeon = this.add.image(this.game.renderer.width / 2-290, this.game.renderer.height / 2-150,'dungeon').setOrigin(0).setDepth()
 
         const startButton = this.add.sprite(this.game.renderer.width / 2 - 100, this.game.renderer.height / 2,'buttons',1)
                 .setInteractive()
@@ -953,8 +953,8 @@
             x: this.cameras.main.centerX - 250,
             y: this.cameras.main.centerY + 100,
             radius: 40,
-            base: this.add.graphics().fillStyle(0x888888).fillCircle(0, 0, 50),
-            thumb: this.add.graphics().fillStyle(0xcccccc).fillCircle(0, 0, 30)
+            base: this.add.graphics().fillStyle(0x150000).fillCircle(0, 0, 50),
+            thumb: this.add.graphics().fillStyle(0xB45F06).fillCircle(0, 0, 30)
           })
           this.cursorKeysVirtual = this.joyStick.createCursorKeys()
         }
@@ -1043,8 +1043,8 @@
             player.setVelocityX(-160)
             player.flipX = true
           } else if (this.cursorKeysVirtual.right.isDown) {
-            player.setVelocityX(160)
             player.anims.play('walk', true)
+            player.setVelocityX(160)
             player.flipX = false
           } else {
             player.anims.play('idle',true)
@@ -1055,6 +1055,13 @@
             soundJump.play();
             player.setFrame(14)
             player.setVelocityY(-295)
+          }
+          if (player.body.velocity.y < 0) {
+            player.setFrame(14)
+          }
+          if (player.body.velocity.y > 0) {
+            player.setFrame(17)
+            player.body.setMaxVelocity(400, 550);
           }
         }
       }
