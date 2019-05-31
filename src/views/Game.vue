@@ -13,8 +13,9 @@
     import _DEMON from '../assets/characters/demon160x128.png'
     import _BUTTONS from '../assets/objects/button.png'
     import _START from '../assets/img/game.png'
-    import _END from '../assets/img/lose.jpg'
+    import _END from '../assets/img/lose.png'
     import _WIN from '../assets/img/win.png'
+    import _DUNGEON  from '../assets/img/dungeon.png'
     //particles
     import _PARTICLES_ARROW from '../assets/particles/arrow.png'
     import _PARTICLES_JSON from '../assets/particles/game/shapes.json'
@@ -38,7 +39,7 @@
     let soundEat,soundJump,soundDamage,soundLose,soundWin,music;
     let musicOn=true;
     let livesText;
-    let button, bgStart, bgEnd,bgWin;
+    let bgStart, bgEnd,bgWin,bgdungeon;
 
     function changeDirection (enemy) {
       enemy.speedX*=-1
@@ -73,12 +74,16 @@
     function createDemons () {
       DemonLayer.forEach(object => {
         let obj = demons.create(object.x, object.y, 'demon',1)
-        obj.setScale(1.5)
-        // obj.setScale(object.width / 64, object.height / 64)
+        obj.body.setSize(70, 100, 90, 28)
+        // frameWidth: 160, frameHeight: 128
+        obj.setScale(1.3)
+
         // obj.setOrigin(0)
         obj.body.width = object.width
         obj.body.height = object.height
-        obj.speedX = -100
+        obj.staticY = object.y
+        obj.speedX = 100
+        obj.body.allowGravity = false
 
       })
     }
@@ -86,7 +91,7 @@
     function lesslive (player, enemy) {
       player.lives = player.lives - 1;
       player.scene.cameras.main.shake(250);
-      player.x =250;
+      player.x =190;
       player.y=150;
       // player.disableBody(true, true)
       livesText.setText('Lives : '+player.lives);
@@ -120,7 +125,7 @@
             default: 'arcade',
             arcade: {
               gravity: {y: 300},
-              debug :false
+              debug :true
             }
           },
           // NO HI HA STATES A 3.0 -> SCENES
@@ -202,6 +207,7 @@
         this.load.image('bgStart',_START)
         this.load.image('bgEnd',_END)
         this.load.image('bgWin',_WIN)
+        this.load.image('dungeon',_DUNGEON)
         //btn
         this.load.spritesheet('buttons',_BUTTONS,{frameWidth:16,frameHeight:16})
         //pa
@@ -218,7 +224,7 @@
 
       }
       create () {
-        this.scene.start('gameStart')
+        this.scene.start('win')
       }
     }
 
@@ -235,6 +241,8 @@
         bgStart = this.add.image(0,0,'bgStart').setOrigin(0).setDepth()
         bgStart.displayHeight = this.game.renderer.height
         bgStart.displayWidth = this.game.renderer.width
+
+        bgdungeon = this.add.image(this.game.renderer.width / 2 -250, this.game.renderer.height / 2-200,'dungeon').setOrigin(0).setDepth()
 
         const startButton = this.add.sprite(this.game.renderer.width / 2 - 100, this.game.renderer.height / 2,'buttons',1)
                 .setInteractive()
@@ -273,10 +281,10 @@
         bgEnd.displayHeight = this.game.renderer.height
         bgEnd.displayWidth = this.game.renderer.width
 
-        const restartButton = this.add.sprite(this.game.renderer.width / 2, this.game.renderer.height / 2+150,'buttons',3)
+        const restartButton = this.add.sprite(this.game.renderer.width / 2, this.game.renderer.height / 2+50,'buttons',3)
                 .setInteractive()
                 .on('pointerdown', () => this.scene.start('inGame'));
-
+        // restartButton.setVisible(false)
         restartButton.displayWidth=40
         restartButton.displayHeight=40
 
@@ -301,9 +309,12 @@
         bgWin.displayHeight = this.game.renderer.height
         bgWin.displayWidth = this.game.renderer.width
 
-        const restartButton = this.add.sprite(this.game.renderer.width / 2, this.game.renderer.height / 2+150,'buttons',3)
+        const restartButton = this.add.sprite(this.game.renderer.width / 2, this.game.renderer.height / 2+100,'buttons',3)
                 .setInteractive()
-                .on('pointerdown', () => this.scene.start('inGame'));
+                .on('pointerdown', () => {
+                  soundWin.pause()
+                  this.scene.start('inGame')
+                });
 
         restartButton.displayWidth=40
         restartButton.displayHeight=40
@@ -673,7 +684,7 @@
 
           if (this.cursors.up.isDown && player.body.onFloor()) {
             player.setFrame(14)
-            player.setVelocityY(-295)
+            player.setVelocityY(-290)
             soundJump.play()
           }
           if (player.body.velocity.y < 0) {
@@ -699,7 +710,7 @@
           }
           if (this.cursorKeysVirtual.up.isDown && player.body.onFloor()) {
             player.setFrame(14)
-            player.setVelocityY(-295) // 340
+            player.setVelocityY(-290) // 340
             soundJump.play();
           }
         }
@@ -763,6 +774,128 @@
         // Habilitar flechas
         this.cursors = this.input.keyboard.createCursorKeys();
 
+        var particlescollapse1 = this.add.particles('collapse')
+        particlescollapse1.createEmitter({
+          "active":true,
+          "visible":true,
+          "collideBottom":true,
+          "collideLeft":true,
+          "collideRight":true,
+          "collideTop":true,
+          "on":true,
+          "particleBringToTop":true,
+          "radial":true,
+          "frame":{
+            "frames":["dirt_01"],
+            "cycle":false,"quantity":1
+          },
+          "frequency":1,
+          "gravityX":0,
+          "gravityY":200,
+          "maxParticles":0,
+          "timeScale":1,
+          "blendMode":1,
+          "accelerationX":0,
+          "accelerationY":0,
+          "alpha":1,
+          "angle":{"min":0,"max":360,"ease":"Linear"},
+          "bounce":0,
+          "delay":0,
+          "lifespan":1000,
+          "maxVelocityX":10000,
+          "maxVelocityY":10000,
+          "moveToX":0,
+          "moveToY":0,
+          "quantity":1,
+          "rotate":0,
+          "scale":1,
+          "speed":0,
+          "x":50,
+          "y":1000,
+          "tint":[3091757],
+          "emitZone":{"source":new Phaser.Geom.Rectangle(0,0,1000,50),"type":"random"},
+          "deathZone":{"source":new Phaser.Geom.Rectangle(0,300,1000,50),"type":"onEnter"}
+        });
+        var particlescollapse2 = this.add.particles('collapse')
+        particlescollapse2.createEmitter({
+          "active":true,
+          "visible":true,
+          "collideBottom":true,
+          "collideLeft":true,
+          "collideRight":true,
+          "collideTop":true,
+          "on":true,
+          "particleBringToTop":true,
+          "radial":true,
+          "frame":{
+            "frames":["dirt_01"],
+            "cycle":false,"quantity":1
+          },
+          "frequency":1,
+          "gravityX":0,
+          "gravityY":300,
+          "maxParticles":0,
+          "timeScale":1,
+          "blendMode":1,
+          "accelerationX":0,
+          "accelerationY":0,
+          "alpha":1,
+          "angle":{"min":0,"max":360,"ease":"Linear"},
+          "bounce":0,
+          "delay":0,
+          "lifespan":1000,
+          "maxVelocityX":10000,
+          "maxVelocityY":10000,
+          "moveToX":0,
+          "moveToY":0,
+          "quantity":1,
+          "rotate":0,
+          "scale":1,
+          "speed":0,
+          "x":350,
+          "y":300,
+          "tint":[3091757],
+          "emitZone":{"source":new Phaser.Geom.Rectangle(0,0,1500,50),"type":"random"},
+          "deathZone":{"source":new Phaser.Geom.Rectangle(0,1100,1500,50),"type":"onEnter"}
+        });
+        var particlesEnd = this.add.particles('collapse')
+        particlesEnd.createEmitter({"active":true,
+          "visible":true,
+          "collideBottom":true,
+          "collideLeft":true,
+          "collideRight":true,
+          "collideTop":true,
+          "on":true,
+          "particleBringToTop":true,
+          "radial":true,
+          "frame":{"frames":["circle_05"],"cycle":false,"quantity":1},
+          "frequency":0,
+          "gravityX":0,
+          "gravityY":0,
+          "maxParticles":0,
+          "timeScale":0.5,
+          "blendMode":1,
+          "accelerationX":0,
+          "accelerationY":0,
+          "alpha":{"ease":"Linear","min":1,"max":5},
+          "angle":{"min":0,"max":360,"ease":"Expo.easeIn"},
+          "bounce":{"ease":"Linear","min":1,"max":2},
+          "delay":{"ease":"Linear","min":1,"max":2000},
+          "lifespan":{"ease":"Stepped","min":1,"max":1.5},
+          "maxVelocityX":10000,
+          "maxVelocityY":10000,
+          "moveToX":0,
+          "moveToY":0,
+          "quantity":{"ease":"Linear","min":0,"max":1.5},
+          "rotate":0,
+          "scale":{"ease":"Linear","min":0,"max":1.5},
+          "speed":{"ease":"Stepped","min":1,"max":2},
+          "x":2600,
+          "y":150,
+          "bounds":{"x":0,"y":0,"width":0,"height":0},
+          "tint":[11911517,4960712,4537989,16777215,0,6474180,6441763,10372243],
+          "emitZone":{"source":new Phaser.Geom.Circle(0,0,70),"type":"random"}})
+
         //Animacion parado
         this.anims.create({
           key:'idle',
@@ -802,6 +935,7 @@
 
         this.physics.add.collider(player,walls)
         this.physics.add.collider(player,enemies,lesslive)
+        this.physics.add.collider(player,demons,lesslive)
         this.physics.add.overlap(player,coins,takeCoin,null,this)
         this.physics.add.collider(player,end,winGame,null,this)
         this.physics.add.collider(enemies,walls)
@@ -869,7 +1003,7 @@
         if (demons){
           demons.children.entries.forEach(function (demon) {
             demon.setVelocityX(demon.speedX)
-            if (demon.speedX>0){
+            if (demon.speedX<0){
               demon.anims.play('idleDemon', true)
               demon.flipX = false
             }else{
