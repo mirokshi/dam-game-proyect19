@@ -125,7 +125,7 @@
             default: 'arcade',
             arcade: {
               gravity: {y: 300},
-              debug :true
+              debug :false
             }
           },
           // NO HI HA STATES A 3.0 -> SCENES
